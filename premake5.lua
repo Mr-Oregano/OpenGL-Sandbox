@@ -61,5 +61,6 @@ workspace "OpenGL-Sandbox"
 	include "Examples/FontRendering"
 	include "Examples/GeometryShader"
 	include "Examples/Textures"
+	include "Examples/Noise"
 
     
