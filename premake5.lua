@@ -37,6 +37,8 @@ workspace "OpenGL-Sandbox"
 		"Debug",
 		"Release"
 	}
+	
+	defines "GLCORE_IMGUI"
 
     filter "configurations:Debug"
 		symbols "On"

@@ -2,7 +2,7 @@
 #include "BatchRenderer2D.h"
 
 #include <GLCore/Core/Instrumentor.h>
-#include "ImGuiExt.h"
+#include <GLCore/ImGui/ImGuiExt.h>
 
 using namespace GLCore;
 using namespace GLCore::Utils;

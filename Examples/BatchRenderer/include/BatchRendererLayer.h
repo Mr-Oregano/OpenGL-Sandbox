@@ -7,7 +7,7 @@
 #include <GLCore/Core/Random.h>
 #include <GLcore/Core/Instrumentor.h>
 
-#include "ImGuiExt.h"
+#include <GLCore/ImGui/ImGuiExt.h>
 
 #include "BatchRenderer2D.h"
 

@@ -44,7 +44,7 @@ namespace ImGuiExt {
 		void End();
 
 	private:
-		GLuint m_FrameBufferHandle;
+		GLuint m_FrameBufferHandle = 0;
 		GLuint m_ColorAttachment0;
 		GLuint m_DepthStencilAttachment;
 

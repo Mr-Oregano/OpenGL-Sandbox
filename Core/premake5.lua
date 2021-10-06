@@ -49,7 +49,8 @@ project "OpenGL-Core"
 
 		defines {
 			"GLCORE_PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_NONE"
+			"GLFW_INCLUDE_NONE",
+			"GLCORE_IMGUI"
 		}
 
 	filter "configurations:Debug"

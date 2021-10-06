@@ -1,4 +1,4 @@
-
+#include "glpch.h"
 #include "ViewportDockspace.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -63,6 +63,9 @@ namespace ImGuiExt {
 
 	void ViewportDockSpace::SetViewport(glm::uvec2 dimensions)
 	{
+		if (dimensions.x == 0 || dimensions.y == 0)
+			return;
+
 		m_Width = dimensions.x;
 		m_Height = dimensions.y;
 		GenerateAttachments();
