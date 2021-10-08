@@ -148,7 +148,7 @@ private:
 	
 	std::vector<Batch::Material> m_Materials;
 
-	glm::vec4 clearColor = { 0.2f, 0.8f, 0.2f, 1.0f };
+	glm::vec4 clearColor = { 0.102f, 0.102f, 0.125f, 1.0f };
 	int s_ROWS = 10;
 	int s_COLS = 10;
 	int s_TEXTURES = 41;

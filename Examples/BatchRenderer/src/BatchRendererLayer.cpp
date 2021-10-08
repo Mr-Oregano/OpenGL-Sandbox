@@ -12,6 +12,7 @@ BatchRendererLayer::BatchRendererLayer()
 	: m_Camera(16.0f / 9.0f)
 {
 }
+
 BatchRendererLayer::~BatchRendererLayer()
 {
 }
@@ -46,10 +47,10 @@ void BatchRendererLayer::OnAttach()
 		GLint format;
 		switch (channels)
 		{
-		case 1: format = GL_RED; break;
-		case 2: format = GL_RG; break;
-		case 3: format = GL_RGB; break;
-		default: format = GL_RGBA; 
+			case 1: format = GL_RED; break;
+			case 2: format = GL_RG; break;
+			case 3: format = GL_RGB; break;
+			default: format = GL_RGBA; 
 		}
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, channels % 2 == 0 ? 2 : 1);
