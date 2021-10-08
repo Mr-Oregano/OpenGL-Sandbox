@@ -9,8 +9,9 @@
 
 layout(location = 0) out vec4 a_Color;
 
+uniform uint u_AlgorithmType;
+
 uniform vec2 u_Resolution;
-uniform float u_Zoom = 1.0;
 
 uniform float u_Evolve;
 uniform uint u_Seed;
@@ -259,10 +260,14 @@ float noise(vec3 coordinates, uint seed, float scale, uint octaves, float lacuna
     {
         divisor += amplitude;
 
-        if (coordinates.x < 0.0)
-            output_noise += amplitude * simplex_noise(coordinates.xy * frequency, seed + i);
-        else
-            output_noise += amplitude * perlin_noise(coordinates.xy * frequency, seed + i);
+        float noise_val = 0.0;
+        switch (u_AlgorithmType)
+        {
+            case 0: noise_val = simplex_noise(coordinates.xy * frequency, seed + i); break;
+            case 1: noise_val = perlin_noise(coordinates.xy * frequency, seed + i); break;
+        }
+
+        output_noise += amplitude * noise_val;
 
         frequency *= lacunarity;
         amplitude *= persistence;
@@ -273,7 +278,8 @@ float noise(vec3 coordinates, uint seed, float scale, uint octaves, float lacuna
 
 void main() 
 {
-    vec2 uv = ((gl_FragCoord.xy / u_Resolution) * 2.0 - 1.0) / u_Zoom;
+    vec2 uv = gl_FragCoord.xy / u_Resolution * 2.0 - 1.0;
+
     vec3 coordinates = vec3(uv * vec2(u_Resolution.x / u_Resolution.y, 1.0), u_Evolve);
 
     a_Color = vec4(noise(coordinates, u_Seed, u_Scale, u_Octaves, u_Lacunarity, u_Persistence));

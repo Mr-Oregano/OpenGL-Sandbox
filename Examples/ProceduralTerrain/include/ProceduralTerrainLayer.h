@@ -21,7 +21,6 @@ private:
 	GLCore::Ref<ImGuiExt::ViewportDockSpace> m_DockSpace;
 
 	bool m_Evolution = true;
-	bool m_Fullscreen = false;
 
 	float m_Zoom = 1.0f;
 
