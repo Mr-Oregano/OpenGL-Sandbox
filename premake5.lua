@@ -64,5 +64,6 @@ workspace "OpenGL-Sandbox"
 	include "Examples/GeometryShader"
 	include "Examples/Textures"
 	include "Examples/Noise"
+	include "Examples/ProceduralTerrain"
 
     

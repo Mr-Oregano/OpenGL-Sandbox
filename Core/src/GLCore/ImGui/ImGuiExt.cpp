@@ -127,6 +127,19 @@ bool KnobInt(const char *label, float *p_value, int v_min, int v_max, float step
 	return value_changed;
 }
 
+void HelpMarker(const char *desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 void Separator(float height)
 {
 	ImGui::Dummy(ImVec2{ 0, height / 2 });
