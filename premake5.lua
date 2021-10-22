@@ -65,5 +65,6 @@ workspace "OpenGL-Sandbox"
 	include "Examples/Textures"
 	include "Examples/Noise"
 	include "Examples/ProceduralTerrain"
+	include "Examples/UniformBuffers"
 
     
