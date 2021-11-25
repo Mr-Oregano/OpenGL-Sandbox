@@ -32,13 +32,21 @@ void UniformBuffersLayer::OnAttach()
 
 	float uniforms[] = 
 	{
-		0.0f, 0.0f, 1.0f, 1.0f
+		0.5f, 0.3f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f
 	};
 
 	glCreateBuffers(1, &uniformBufferHandle);
-	glBindBuffer(GL_UNIFORM_BUFFER, uniformBufferHandle);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(uniforms), uniforms, GL_STATIC_DRAW);
+	glNamedBufferStorage(uniformBufferHandle, sizeof(uniforms), uniforms, 0);
+	
+	std::cout << "Block index: " << glGetUniformBlockIndex(program, "Uniforms") << std::endl;
+
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformBufferHandle);
+
+	// NOTE: In OpenGL 4.2+ it is possible to set bind the interface block 
+	//		 directly in GLSL via the "binding" layout attribute.
+	// 
+	// glUniformBlockBinding(program, 0, 1);
 
 	float vertices[] =
 	{
