@@ -63,6 +63,10 @@ namespace GLCore {
 		{
 			PROFILE_SCOPE("glfwCreateWindow()");
 			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, props.Title.c_str(), nullptr, nullptr);
+			
+			// We need to retrieve the correct content size of the window in case it was maximized or minimized.
+			//
+			glfwGetWindowSize(m_Window, (int*) &m_Data.props.Width, (int *) &m_Data.props.Height); 
 		}
 
 		switch (props.Cursor)
