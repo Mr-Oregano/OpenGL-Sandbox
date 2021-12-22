@@ -20,8 +20,8 @@ project "OpenGL-Core"
 	files {
 		"src/**.h",
 		"src/**.cpp",
-		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp",
+		"vendor/stb/**.h",
+		"vendor/stb/**.cpp",
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 	}
@@ -35,7 +35,7 @@ project "OpenGL-Core"
 		"vendor/Glad/include",
 		"vendor/imgui",
 		"vendor/glm",
-		"vendor/stb_image"
+		"vendor/stb"
 	}
 
 	links { 

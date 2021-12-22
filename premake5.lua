@@ -19,7 +19,7 @@ function CreateDefaultProject(name)
 	includedirs {
 		"include",
 		"../../Core/src",
-		"../../Core/vendor",
+		"../../Core/vendor/stb",
 		"../../Core/vendor/spdlog/include",
 		"../../Core/vendor/glm",
 		"../../Core/vendor/Glad/include",
