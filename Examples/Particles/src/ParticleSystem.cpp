@@ -17,12 +17,12 @@ ParticleSystem::ParticleSystem(ParticleSystemProp props)
 	glCreateVertexArrays(1, &m_VertexArrayHandle);
 	glVertexArrayVertexBuffer(m_VertexArrayHandle, 0, m_VertexBufferHandle, 0, sizeof(Particle));
 	
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 0, 4, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 3, 1, GL_FLOAT, GL_FALSE, 8 * sizeof(float));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 4, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 5, 1, GL_FLOAT, GL_FALSE, 10 * sizeof(float));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 0, 4, GL_UNSIGNED_BYTE, GL_TRUE, offsetof(Particle, color));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Particle, position));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Particle, velocity));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 3, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, size));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 4, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, rotation));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 5, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, life));
 
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 0, 0);
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 1, 0);
@@ -71,7 +71,7 @@ void ParticleSystem::Update(GLCore::Timestep ts)
 		p.life -= ts;
 
 		float interpolate = 1.0f - p.life / m_Prop.maxlife;
-		p.color = glm::mix(m_Prop.startColor, m_Prop.endColor, interpolate);
+		p.color = LerpColor(m_Prop.startColor, m_Prop.endColor, interpolate);
 
 		p.position += (float)ts * p.velocity;
 		p.size = glm::mix(m_Prop.startSize, m_Prop.endSize, interpolate);
@@ -85,6 +85,26 @@ void ParticleSystem::Update(GLCore::Timestep ts)
 		m_ParticlePool[i - deadCount] = m_ParticlePool[i];
 
 	m_InsertIndex -= deadCount;
+}
+
+uint32_t ParticleSystem::LerpColor(uint32_t c1, uint32_t c2, float value)
+{
+	uint32_t r1 = c1 >> 24 & 0xff;
+	uint32_t g1 = c1 >> 16 & 0xff;
+	uint32_t b1 = c1 >> 8 & 0xff;
+	uint32_t a1 = c1 & 0xff;
+	
+	uint32_t r2 = c2 >> 24 & 0xff;
+	uint32_t g2 = c2 >> 16 & 0xff;
+	uint32_t b2 = c2 >> 8 & 0xff;
+	uint32_t a2 = c2 & 0xff;
+	
+	uint32_t r3 = static_cast<uint32_t>(r1 * (1.0f - value) + r2 * value);
+	uint32_t g3 = static_cast<uint32_t>(g1 * (1.0f - value) + g2 * value);
+	uint32_t b3 = static_cast<uint32_t>(b1 * (1.0f - value) + b2 * value);
+	uint32_t a3 = static_cast<uint32_t>(a1 * (1.0f - value) + a2 * value);
+
+	return (r3 << 24) | (g3 << 16) | (b3 << 8) | a3;
 }
 
 void ParticleSystem::Render(GLCore::Utils::OrthographicCameraController &camera)

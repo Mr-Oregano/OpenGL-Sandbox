@@ -16,7 +16,7 @@ ParticlesLayer ::~ParticlesLayer()
 {
 }
 
-static int particleSpawn = 100;
+static int particleSpawn = 1;
 
 void ParticlesLayer::OnAttach()
 {
@@ -24,14 +24,14 @@ void ParticlesLayer::OnAttach()
 
 	ParticleSystemProp props{};
 
-	props.startColor = { 0.2f, 0.5f, 1.0f, 1.0f };
-	props.endColor = { 0.3f, 1.0f, 0.5f, 0.0f };
-	props.position = { 0.0f, 0.0f, 0.0f };
+	props.startColor = 0xffffffff;
+	props.endColor = 0x00000000;
+	props.position = { 0.0f, 0.0f };
 	props.startSize = 0.25f;
 	props.endSize = 0.0f;
 	props.rotationVel = 200.0f;
 	props.speed = 1.0f;
-	props.maxlife = 2.0f;
+	props.maxlife = 1.0f;
 
 	particles = new ParticleSystem(props);
 }
@@ -84,8 +84,18 @@ void ParticlesLayer::OnUpdate(Timestep ts)
 void ParticlesLayer::OnImGuiRender()
 {
 	ImGui::Begin("Particle Properties");
-	ImGui::ColorEdit4("Color #1", glm::value_ptr(particles->GetProperties().startColor));
-	ImGui::ColorEdit4("Color #2", glm::value_ptr(particles->GetProperties().endColor));
+	
+	uint32_t &startColor = particles->GetProperties().startColor;
+	uint32_t &endColor = particles->GetProperties().endColor;
+
+	ImVec4 startColor4fv = ImGui::ColorConvertU32ToFloat4(startColor);
+	ImVec4 endColor4fv = ImGui::ColorConvertU32ToFloat4(endColor);
+
+	ImGui::ColorEdit4("Color #1", &startColor4fv.x, ImGuiColorEditFlags_AlphaBar);
+	ImGui::ColorEdit4("Color #2", &endColor4fv.x, ImGuiColorEditFlags_AlphaBar);
+	
+	startColor = static_cast<uint32_t>(ImGui::ColorConvertFloat4ToU32(startColor4fv));
+	endColor = static_cast<uint32_t>(ImGui::ColorConvertFloat4ToU32(endColor4fv));
 
 	ImGui::Separator();
 	ImGui::DragFloat("Size #1", &particles->GetProperties().startSize, 0.01f, 0.0f, 10.0f, "%.3f");

@@ -13,9 +13,9 @@
 
 struct ParticleSystemProp
 {
-	glm::vec4 startColor;
-	glm::vec4 endColor;
-	glm::vec3 position;
+	uint32_t startColor;
+	uint32_t endColor;
+	glm::vec2 position;
 		
 	float startSize = 0;
 	float endSize = 0;
@@ -33,7 +33,7 @@ private:
 
 	struct Particle
 	{
-		glm::vec4 color{1.0f};
+		uint32_t color;
 		glm::vec2 position{1.0f};
 		glm::vec2 velocity{1.0f};
 		float size = 0.0f;
@@ -50,6 +50,9 @@ private:
 	GLCore::Ref<GLCore::Utils::Shader> m_Shader;
 
 	GLint m_ShaderViewProjUniformLoc = -1;
+
+private:
+	uint32_t LerpColor(uint32_t c1, uint32_t c2, float value);
 
 public:
 	ParticleSystem(ParticleSystemProp props);
