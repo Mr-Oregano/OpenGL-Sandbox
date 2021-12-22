@@ -38,7 +38,10 @@ workspace "OpenGL-Sandbox"
 		"Release"
 	}
 	
-	defines "GLCORE_IMGUI"
+	defines {
+		"GLCORE_IMGUI",
+		"PROFILING=0"
+	}
 
     filter "configurations:Debug"
 		symbols "On"
@@ -66,5 +69,6 @@ workspace "OpenGL-Sandbox"
 	include "Examples/Noise"
 	include "Examples/ProceduralTerrain"
 	include "Examples/UniformBuffers"
+	include "Examples/Particles"
 
     
