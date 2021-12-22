@@ -16,8 +16,6 @@ ParticlesLayer ::~ParticlesLayer()
 {
 }
 
-static int particleSpawn = 1;
-
 void ParticlesLayer::OnAttach()
 {
 	EnableGLDebugging();
@@ -26,10 +24,12 @@ void ParticlesLayer::OnAttach()
 
 	props.startColor = 0xffffffff;
 	props.endColor = 0x00000000;
-	props.position = { 0.0f, 0.0f };
+	props.position = { -1.0f, 0.0f };
+	props.direction = { 1.0f, 0.0f };
+	props.precision = 0.8f;
 	props.startSize = 0.25f;
 	props.endSize = 0.0f;
-	props.rotationVel = 200.0f;
+	props.rotationVel = 0.0f;
 	props.speed = 1.0f;
 	props.maxlife = 1.0f;
 
@@ -59,26 +59,25 @@ void ParticlesLayer::OnUpdate(Timestep ts)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (Input::IsMouseButtonPressed(0))
-	{
-		uint32_t winWidth = Application::Get().GetWindow().GetWidth();
-		uint32_t winHeight = Application::Get().GetWindow().GetHeight();
+	uint32_t winWidth = Application::Get().GetWindow().GetWidth();
+	uint32_t winHeight = Application::Get().GetWindow().GetHeight();
 
-		particles->GetProperties().position.x = m_Camera.GetZoomLevel()
-			* ((float)winWidth / winHeight)
-			* (Input::GetMouseX() / winWidth * 2.0f - 1.0f)
-			+ m_Camera.GetCamera().GetPosition().x;
+	glm::vec2 clickPos;
+	clickPos.x = m_Camera.GetZoomLevel()
+		* ((float)winWidth / winHeight)
+		* (Input::GetMouseX() / winWidth * 2.0f - 1.0f)
+		+ m_Camera.GetCamera().GetPosition().x;
 
-		particles->GetProperties().position.y = m_Camera.GetZoomLevel()
-			* -(Input::GetMouseY() / winHeight * 2.0f - 1.0f)
-			+ m_Camera.GetCamera().GetPosition().y;
+	clickPos.y = m_Camera.GetZoomLevel()
+		* -(Input::GetMouseY() / winHeight * 2.0f - 1.0f)
+		+ m_Camera.GetCamera().GetPosition().y;
 
-		for (int i = 0; i < particleSpawn; ++i)
-			particles->Emit();
-	}
+	particles->GetProperties().direction = clickPos - particles->GetProperties().position;
 
-	particles->Update(ts);
+	particles->Emit();
+
 	particles->Render(m_Camera);
+	particles->Update(ts);
 }
 
 void ParticlesLayer::OnImGuiRender()
@@ -98,20 +97,20 @@ void ParticlesLayer::OnImGuiRender()
 	endColor = static_cast<uint32_t>(ImGui::ColorConvertFloat4ToU32(endColor4fv));
 
 	ImGui::Separator();
-	ImGui::DragFloat("Size #1", &particles->GetProperties().startSize, 0.01f, 0.0f, 10.0f, "%.3f");
-	ImGui::DragFloat("Size #2", &particles->GetProperties().endSize, 0.01f, 0.0f, 10.0f, "%.3f");
+	ImGui::DragFloat("Size #1", &particles->GetProperties().startSize, 0.01f, 0.0f, 10.0f, "%.2f");
+	ImGui::DragFloat("Size #2", &particles->GetProperties().endSize, 0.01f, 0.0f, 10.0f, "%.2f");
 
 	ImGui::Separator();
-	ImGui::DragFloat("Rotation velocity", &particles->GetProperties().rotationVel, 0.01f, -25.0f, 25.0f, "%.3f");
+	ImGui::DragFloat("Rotation velocity", &particles->GetProperties().rotationVel, 1.0f, -200.0f, 200.0f, "%.0f");
 
 	ImGui::Separator();
-	ImGui::DragFloat("Speed", &particles->GetProperties().speed, 0.01f, 0.0f, 10.0f, "%.3f");
+	ImGui::DragFloat("Speed", &particles->GetProperties().speed, 0.01f, 0.0f, 10.0f, "%.2f");
 
 	ImGui::Separator();
-	ImGui::DragFloat("Liftime", &particles->GetProperties().maxlife, 0.01f, 0.0f, 10.0f, "%.3f sec");
+	ImGui::DragFloat("Liftime", &particles->GetProperties().maxlife, 0.01f, 0.0f, 10.0f, "%.2f sec");
 
 	ImGui::Separator();
-	ImGui::DragInt("Spawn amount", &particleSpawn, 1, 1, 100);
+	ImGui::DragFloat("Precision", &particles->GetProperties().precision, 0.01f, 0.0f, 1.0f, "%.2f");
 
 	ImGui::End();
 }

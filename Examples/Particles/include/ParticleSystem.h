@@ -15,7 +15,10 @@ struct ParticleSystemProp
 {
 	uint32_t startColor;
 	uint32_t endColor;
+	
 	glm::vec2 position;
+	glm::vec2 direction;
+	float precision;
 		
 	float startSize = 0;
 	float endSize = 0;

@@ -148,13 +148,24 @@ void ParticleSystem::Emit()
 
 	Particle &p = m_ParticlePool[m_InsertIndex];
 
-	float rotation = Random::Float() * 360.0f;
-
 	p.position = m_Prop.position;
 	p.size = m_Prop.startSize;
-	p.rotation = rotation;
+	
+	// Random orientation
+	// p.rotation = Random::Float() * 360.0f;
+	p.rotation = 0.0f;
 
-	p.velocity = { glm::cos(rotation), glm::sin(rotation) };
+	// precision
+	using namespace glm;
+
+	m_Prop.direction = glm::normalize(m_Prop.direction);
+
+	float angleOffset = (1.0f - m_Prop.precision) * (Random::Float() * 2.0f - 1.0f) * glm::pi<float>();
+	mat2 m = mat2(
+		vec2(glm::cos(angleOffset), glm::sin(angleOffset)),
+		vec2(-glm::sin(angleOffset), glm::cos(angleOffset)));
+
+	p.velocity = m * m_Prop.direction;
 	p.velocity *= m_Prop.speed;
 
 	p.color = m_Prop.startColor;
