@@ -77,7 +77,7 @@ void ParticleSystem::Update(GLCore::Timestep ts)
 		p.size = glm::mix(m_Prop.startSize, m_Prop.endSize, interpolate);
 		p.rotation += ts * m_Prop.rotationVel;
 
-		if (i != 0 && m_ParticlePool[i - 1].life < 0.0f)
+		if (p.life < 0.0f)
 			++deadCount;
 	}
 
