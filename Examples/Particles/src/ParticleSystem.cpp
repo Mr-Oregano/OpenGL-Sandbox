@@ -89,6 +89,9 @@ void ParticleSystem::Update(GLCore::Timestep ts)
 
 void ParticleSystem::Render(GLCore::Utils::OrthographicCameraController &camera)
 {
+	if (m_InsertIndex == 0)
+		return; // Nothing to render.
+
 	PROFILE_FUNCTION();
 
 	// Submit camera to GPU
@@ -125,7 +128,7 @@ void ParticleSystem::Emit()
 
 	Particle &p = m_ParticlePool[m_InsertIndex];
 
-	float rotation = Random::Float() * 2.0f * glm::pi<float>();
+	float rotation = Random::Float() * 360.0f;
 
 	p.position = m_Prop.position;
 	p.size = m_Prop.startSize;
