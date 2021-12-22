@@ -47,4 +47,16 @@ namespace GLCore {
 		}
 	}
 
+	void LayerStack::PopAll()
+	{
+		auto it = m_Layers.begin();
+		while (it != m_Layers.end())
+		{
+			(*it)->OnDetach();
+			delete *it;
+			it = m_Layers.erase(it);
+		}
+		m_LayerInsertIndex = 0;
+	}
+
 }

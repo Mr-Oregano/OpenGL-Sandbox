@@ -130,8 +130,8 @@ namespace GLCore {
 
 			// When we're done running, detach all layers so memory
 			// can be cleaned up.
-			for (Layer *layer : m_LayerStack)
-				PopLayer(layer);
+			//
+			m_LayerStack.PopAll();
 		}
 
 		PROFILE_SESSION_END();
