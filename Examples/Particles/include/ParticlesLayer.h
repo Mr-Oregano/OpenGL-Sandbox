@@ -15,6 +15,8 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnEvent(GLCore::Event& event) override;
 	virtual void OnUpdate(GLCore::Timestep ts) override;
+	
+	void ImGuiLoadTexture();
 	virtual void OnImGuiRender() override;
 
 	bool OnMouseButtonPressed(GLCore::MouseButtonPressedEvent& e);

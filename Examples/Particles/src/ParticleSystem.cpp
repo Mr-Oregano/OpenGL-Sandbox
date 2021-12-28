@@ -35,12 +35,18 @@ ParticleSystem::ParticleSystem(ParticleSystemProp props)
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 3);
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 4);
 
-	// Shader
+	// Shader & Resources
+
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_DefaultTextureHandle);
+	glTextureStorage2D(m_DefaultTextureHandle, 1, GL_RGBA8, 1, 1);
+	
+	int color = 0xFFFFFFFF;
+	glTextureSubImage2D(m_DefaultTextureHandle, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (const void*) &color);
 
 	m_Shader = Shader::FromGLSLTextFiles(
-		"res/vert.glsl",
-		"res/geom.glsl",
-		"res/frag.glsl"
+		"res/shaders/vert.glsl",
+		"res/shaders/geom.glsl",
+		"res/shaders/frag.glsl"
 	);
 
 	m_ShaderHandle = m_Shader->GetRendererID();
@@ -123,9 +129,10 @@ void ParticleSystem::Render(GLCore::Utils::OrthographicCameraController &camera)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Upload camera to program
+	// Upload uniforms and textures to program
 
 	glProgramUniformMatrix4fv(m_ShaderHandle, m_ShaderViewProjUniformLoc, 1, GL_FALSE, glm::value_ptr(camera.GetCamera().GetViewProjectionMatrix()));
+	glBindTextureUnit(0, m_Prop.texture);
 
 	// Map client-side memory to host-side memory
 
@@ -147,6 +154,9 @@ void ParticleSystem::Emit()
 		LOG_WARN("Pool not large enough skipping particles");
 		return;
 	}
+
+	if (!m_Prop.texture)
+		m_Prop.texture = m_DefaultTextureHandle;
 
 	Particle &p = m_ParticlePool[m_InsertIndex];
 

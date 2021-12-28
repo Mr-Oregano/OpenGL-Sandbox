@@ -18,6 +18,7 @@
 //		
 struct ParticleSystemProp
 {
+	GLuint texture;
 	uint32_t startColor;
 	uint32_t endColor;
 	
@@ -56,6 +57,7 @@ private:
 	std::vector<Particle> m_ParticlePool;
 	size_t m_InsertIndex = 0;
 
+	GLuint m_DefaultTextureHandle = 0;
 	GLuint m_VertexArrayHandle = 0;
 	GLuint m_VertexBufferHandle = 0;
 	GLuint m_ShaderHandle = 0;

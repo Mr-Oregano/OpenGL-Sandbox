@@ -12,6 +12,7 @@ in float v2g_Life[];
 
 out vec4 g2f_Color;
 out float g2f_Life;
+out vec2 g2f_TexCoords;
 
 void main() 
 {
@@ -35,18 +36,22 @@ void main()
 
     vec2 newPos = pos + model * v11;
     gl_Position = u_ViewProjection * vec4(newPos, 0.0, 1.0);
+    g2f_TexCoords = vec2(1.0);
     EmitVertex();
 
     newPos = pos + model * v01;
     gl_Position = u_ViewProjection * vec4(newPos, 0.0, 1.0);
+    g2f_TexCoords = vec2(0.0, 1.0);
     EmitVertex();
 
     newPos = pos + model * v10;
     gl_Position = u_ViewProjection * vec4(newPos, 0.0, 1.0);
+    g2f_TexCoords = vec2(1.0, 0.0);
     EmitVertex();
 
     newPos = pos + model * v00;
     gl_Position = u_ViewProjection * vec4(newPos, 0.0, 1.0);
+    g2f_TexCoords = vec2(0.0);
     EmitVertex();
 
     EndPrimitive();
