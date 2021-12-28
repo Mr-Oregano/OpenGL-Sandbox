@@ -2,9 +2,9 @@
 
 layout (location = 0) in vec4 a_Color;
 layout (location = 1) in vec4 a_Position;
-layout (location = 3) in float a_Size;
-layout (location = 4) in float a_Rotation;
-layout (location = 5) in float a_Life;
+layout (location = 2) in float a_Size;
+layout (location = 3) in float a_Rotation;
+layout (location = 4) in float a_Life;
 
 out vec4 v2g_Color;
 out float v2g_Rotation;

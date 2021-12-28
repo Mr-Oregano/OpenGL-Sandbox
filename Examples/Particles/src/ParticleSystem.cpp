@@ -19,24 +19,21 @@ ParticleSystem::ParticleSystem(ParticleSystemProp props)
 	
 	glVertexArrayAttribFormat(m_VertexArrayHandle, 0, 4, GL_UNSIGNED_BYTE, GL_TRUE, offsetof(Particle, color));
 	glVertexArrayAttribFormat(m_VertexArrayHandle, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Particle, position));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Particle, velocity));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 3, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, size));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 4, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, rotation));
-	glVertexArrayAttribFormat(m_VertexArrayHandle, 5, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, life));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 2, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, size));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 3, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, rotation));
+	glVertexArrayAttribFormat(m_VertexArrayHandle, 4, 1, GL_FLOAT, GL_FALSE, offsetof(Particle, life));
 
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 0, 0);
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 1, 0);
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 2, 0);
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 3, 0);
 	glVertexArrayAttribBinding(m_VertexArrayHandle, 4, 0);
-	glVertexArrayAttribBinding(m_VertexArrayHandle, 5, 0);
 
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 0);
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 1);
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 2);
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 3);
 	glEnableVertexArrayAttrib(m_VertexArrayHandle, 4);
-	glEnableVertexArrayAttrib(m_VertexArrayHandle, 5);
 
 	// Shader
 
@@ -68,17 +65,22 @@ void ParticleSystem::Update(GLCore::Timestep ts)
 	for (size_t i = 0; i < m_InsertIndex; ++i)
 	{
 		Particle &p = m_ParticlePool[i];
-		p.life -= ts;
+
+		if (p.life < 0.0f)
+		{
+			++deadCount;
+			continue;
+		}
 
 		float interpolate = 1.0f - p.life / m_Prop.maxlife;
 		p.color = LerpColor(m_Prop.startColor, m_Prop.endColor, interpolate);
+		
+		float speed = glm::max(m_Prop.speed + m_Prop.acceleration * interpolate, 0.0f);
+		p.position += (speed * p.velocity + m_Prop.externalForce) * (float) ts;
 
-		p.position += (float)ts * p.velocity;
 		p.size = glm::mix(m_Prop.startSize, m_Prop.endSize, interpolate);
 		p.rotation += ts * m_Prop.rotationVel;
-
-		if (p.life < 0.0f)
-			++deadCount;
+		p.life -= ts;
 	}
 
 	for (size_t i = deadCount; i < m_InsertIndex; ++i)
@@ -114,18 +116,18 @@ void ParticleSystem::Render(GLCore::Utils::OrthographicCameraController &camera)
 
 	PROFILE_FUNCTION();
 
-	// Submit camera to GPU
-
-	glProgramUniformMatrix4fv(m_ShaderHandle, m_ShaderViewProjUniformLoc, 1, GL_FALSE, glm::value_ptr(camera.GetCamera().GetViewProjectionMatrix()));
-
-	// Enable shader & fixed pipeline state
+	// Install program & set pipeline state
 
 	glUseProgram(m_ShaderHandle);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Map client batch to GPU buffer
+	// Upload camera to program
+
+	glProgramUniformMatrix4fv(m_ShaderHandle, m_ShaderViewProjUniformLoc, 1, GL_FALSE, glm::value_ptr(camera.GetCamera().GetViewProjectionMatrix()));
+
+	// Map client-side memory to host-side memory
 
 	glNamedBufferSubData(m_VertexBufferHandle, 0, m_InsertIndex * sizeof(Particle), m_ParticlePool.data());
 
@@ -150,23 +152,25 @@ void ParticleSystem::Emit()
 
 	p.position = m_Prop.position;
 	p.size = m_Prop.startSize;
+	p.rotation = 0.0f;
 	
 	// Random orientation
-	// p.rotation = Random::Float() * 360.0f;
-	p.rotation = 0.0f;
+	p.rotation = Random::Float() * 360.0f;
 
-	// precision
 	using namespace glm;
 
 	m_Prop.direction = glm::normalize(m_Prop.direction);
 
-	float angleOffset = (1.0f - m_Prop.precision) * (Random::Float() * 2.0f - 1.0f) * glm::pi<float>();
+	// directional precision
+	float angleOffset = (1.0f - m_Prop.dir_precision) * (Random::Float() * 2.0f - 1.0f) * glm::pi<float>();
 	mat2 m = mat2(
 		vec2(glm::cos(angleOffset), glm::sin(angleOffset)),
 		vec2(-glm::sin(angleOffset), glm::cos(angleOffset)));
 
 	p.velocity = m * m_Prop.direction;
-	p.velocity *= m_Prop.speed;
+
+	// velocity precision
+	p.velocity += p.velocity * (1.0f - m_Prop.speed_precision) * (Random::Float() * 2.0f - 1.0f);
 
 	p.color = m_Prop.startColor;
 	p.life = m_Prop.maxlife;

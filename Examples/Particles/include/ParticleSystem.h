@@ -11,6 +11,11 @@
 
 #define POOL_SIZE 100000
 
+// TODO: It may be better to represent particles based on 'start' and 'end'
+//		 properties, rather than attributes like speed, or velocity, etc.
+//		 this allows us to have better control over how the attributes are 
+//		 interpolated over time.
+//		
 struct ParticleSystemProp
 {
 	uint32_t startColor;
@@ -18,14 +23,18 @@ struct ParticleSystemProp
 	
 	glm::vec2 position;
 	glm::vec2 direction;
-	float precision;
-		
+	float dir_precision;
+	
+	float speed = 0;
+	float speed_precision;
+	float acceleration = 0;
+	float rotationVel = 0;
+	
+	glm::vec2 externalForce;
+	
 	float startSize = 0;
 	float endSize = 0;
 
-	float rotationVel = 0;
-	float speed = 0;
-		
 	float maxlife = 0;
 };
 
