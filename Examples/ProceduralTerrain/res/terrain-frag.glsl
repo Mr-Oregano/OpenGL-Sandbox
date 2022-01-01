@@ -9,17 +9,18 @@
 
 layout(location = 0) out vec4 a_Color;
 
-uniform uint u_AlgorithmType;
-
-uniform vec2 u_Resolution;
-
-uniform float u_Evolve;
-uniform uint u_Seed;
-
-uniform float u_Scale = 1.0;
-uniform float u_Lacunarity = 1.0;
-uniform float u_Persistence = 1.0;
-uniform uint  u_Octaves = 1;
+layout (std140, binding = 0) uniform Properties
+{
+    uint u_AlgorithmType;
+    uint u_Seed;
+    uint u_Octaves;
+    float u_Evolve;
+    float u_Scale;
+    float u_Lacunarity;
+    float u_Persistence;
+    // float of padding
+    vec2 u_Resolution;
+};
 
 uint hash(uint key) 
 {
