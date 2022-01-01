@@ -5,7 +5,14 @@
 
 #include "Font.h"
 
-class TextRenderer
+// TODO: Batch geometry.
+//
+// TODO: Implement kerning
+//
+// TODO: Perhaps implement rich text and parse escape characters
+//
+
+class FontRenderer
 {
 public:
 	static void Init();

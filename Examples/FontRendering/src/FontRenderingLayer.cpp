@@ -1,5 +1,6 @@
 
 #include "FontRenderingLayer.h"
+#include "FontRenderer.h"
 
 using namespace GLCore;
 using namespace GLCore::Utils;
@@ -19,12 +20,12 @@ void FontRenderingLayer::OnAttach()
 
 	m_Anglodavek = Font::LoadFromFile("res/fonts/anglodavek.fnt");
 	m_Roboto = Font::LoadFromFile("res/fonts/roboto.fnt");
-	TextRenderer::Init();
+	FontRenderer::Init();
 }
 
 void FontRenderingLayer::OnDetach()
 {
-	TextRenderer::Shutdown();
+	FontRenderer::Shutdown();
 }
 
 void FontRenderingLayer::OnEvent(Event& event)
@@ -44,17 +45,17 @@ void FontRenderingLayer::OnUpdate(Timestep ts)
 	m_Camera.OnUpdate(ts);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	TextRenderer::Begin(m_Camera.GetCamera());
+	FontRenderer::Begin(m_Camera.GetCamera());
 
 	static float time = 0.0f;
 	time += ts;
 
 	float scale =  0.5f * glm::sin(glm::radians(time * 100.0f)) + 0.5f;
 
-	TextRenderer::DrawString("Realms of Ostaga", { 0, 0 }, 1.0f);
+	FontRenderer::DrawString("Hello, world!", { 0, 0 }, 1.0f);
 	time += ts;
 
-	TextRenderer::End();
+	FontRenderer::End();
 }
 
 void FontRenderingLayer::OnImGuiRender()

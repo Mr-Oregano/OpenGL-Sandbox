@@ -1,14 +1,14 @@
 
-#include "TextRenderer.h"
+#include "FontRenderer.h"
 
 #include <array>
 
 using namespace GLCore;
 using namespace GLCore::Utils;
 
-TextRenderer::Assets *TextRenderer::s_Assets = nullptr;
+FontRenderer::Assets *FontRenderer::s_Assets = nullptr;
 
-void TextRenderer::Init()
+void FontRenderer::Init()
 {
 	s_Assets = new Assets();
 
@@ -53,13 +53,13 @@ void TextRenderer::Init()
 	}
 }
 
-void TextRenderer::Shutdown()
+void FontRenderer::Shutdown()
 {
 	delete s_Assets;
 	s_Assets = nullptr;
 }
 
-void TextRenderer::Begin(const GLCore::Utils::OrthographicCamera &camera)
+void FontRenderer::Begin(const GLCore::Utils::OrthographicCamera &camera)
 {
 	glUseProgram(s_Assets->shader->GetRendererID());
 	GLint loc = glGetUniformLocation(s_Assets->shader->GetRendererID(), "u_ViewProjection");
@@ -71,12 +71,12 @@ void TextRenderer::Begin(const GLCore::Utils::OrthographicCamera &camera)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-void TextRenderer::End()
+void FontRenderer::End()
 {
 	glDisable(GL_BLEND);
 }
 
-void TextRenderer::DrawString( 
+void FontRenderer::DrawString( 
 	const std::string &text, 
 	glm::vec2 pos, 
 	float scale, 

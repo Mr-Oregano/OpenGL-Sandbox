@@ -4,7 +4,6 @@
 #include <GLCoreUtils.h>
 
 #include "Font.h"
-#include "TextRenderer.h"
 
 class FontRenderingLayer : public GLCore::Layer
 {
