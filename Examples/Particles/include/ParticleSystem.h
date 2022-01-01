@@ -11,6 +11,13 @@
 
 #define POOL_SIZE 100000
 
+enum ParticleBlend
+{
+	NONE,
+	TRANSPARENCY,
+	ADDITIVE_TRANSPARENCY
+};
+
 // TODO: It may be better to represent particles based on 'start' and 'end'
 //		 properties, rather than attributes like speed, or velocity, etc.
 //		 this allows us to have better control over how the attributes are 
@@ -37,6 +44,7 @@ struct ParticleSystemProp
 	float endSize = 0;
 
 	float maxlife = 0;
+	ParticleBlend blending = TRANSPARENCY;
 };
 
 class ParticleSystem

@@ -126,8 +126,20 @@ void ParticleSystem::Render(GLCore::Utils::OrthographicCameraController &camera)
 
 	glUseProgram(m_ShaderHandle);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	switch (m_Prop.blending)
+	{
+	case TRANSPARENCY:
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	
+	case ADDITIVE_TRANSPARENCY:
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+
+	default: glDisable(GL_BLEND);
+	}
 
 	// Upload uniforms and textures to program
 

@@ -76,6 +76,7 @@ void ParticlesLayer::OnAttach()
 	props.startSize = 0.15f;
 	props.endSize = 0.75f;
 	props.maxlife = 4.0f;
+	props.blending = ParticleBlend::ADDITIVE_TRANSPARENCY;
 
 	props.texture = LoadTexture("res/textures/smoke.png");
 
