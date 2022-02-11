@@ -4,6 +4,9 @@
 #include <GLCoreUtils.h>
 #include <GLCore/ImGui/ImGuiExt.h>
 
+// Must be a multiple of 4
+#define MAX_MAP_ENTRIES 12
+
 struct PropertiesUniforms
 {
 	int algorithmType;
@@ -13,7 +16,11 @@ struct PropertiesUniforms
 	float scale;
 	float lacunarity;
 	float persistence;
-	float _padding;
+	
+	unsigned int mapSize;
+	glm::vec4 mapColors[MAX_MAP_ENTRIES];
+	glm::vec4 mapRanges[MAX_MAP_ENTRIES / 4];
+	
 	glm::vec2 resolution;
 };
 
@@ -27,6 +34,8 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnEvent(GLCore::Event &event) override;
 	virtual void OnUpdate(GLCore::Timestep ts) override;
+
+	bool MapEntry(float *colors, float *min, float *max, int id = 0);
 	virtual void OnImGuiRender() override;
 
 private:

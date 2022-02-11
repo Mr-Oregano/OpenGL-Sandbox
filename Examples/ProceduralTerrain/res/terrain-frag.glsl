@@ -7,19 +7,28 @@
 // Integer representation of floating point 1.0
 #define IEEE_754_ONE 0x3f800000u
 
+// Must be a multiple of 4
+#define MAX_MAP_ENTRIES 12
+
 layout(location = 0) out vec4 a_Color;
 
 layout (std140, binding = 0) uniform Properties
 {
-    uint u_AlgorithmType;
-    uint u_Seed;
-    uint u_Octaves;
-    float u_Evolve;
-    float u_Scale;
-    float u_Lacunarity;
-    float u_Persistence;
-    // float of padding
-    vec2 u_Resolution;
+    uint u_AlgorithmType;       // offset: 0, size: 4, base-alignment: 4, aligned-offset: 0
+    uint u_Seed;                // offset: 4, size: 4, base-alignment: 4, aligned-offset: 4
+    uint u_Octaves;             // offset: 8, size: 4, base-alignment: 4, aligned-offset: 8
+    float u_Evolve;             // offset: 12, size: 4, base-alignment: 4, aligned-offset: 12
+    float u_Scale;              // offset: 16, size: 4, base-alignment: 4, aligned-offset: 16
+    float u_Lacunarity;         // offset: 20, size: 4, base-alignment: 4, aligned-offset: 20
+    float u_Persistence;        // offset: 24, size: 4, base-alignment: 4, aligned-offset: 24
+    
+    // Color map
+    uint u_MapSize;                             // offset: 28, size: 4, base-alignment: 4, aligned-offset: 28
+    vec4 u_MapColors[MAX_MAP_ENTRIES];          // offset: 32, size: 16 * MAX_MAP_ENTRIES, base-alignment: 16, aligned-offset: 32
+    vec4 u_MapRanges[MAX_MAP_ENTRIES / 4];      // offset: 32 + 16 * MAX_MAP_ENTRIES, size: 4 * MAX_MAP_ENTRIES, base-alignment: 16, aligned-offset: 32 + 16 * MAX_MAP_ENTRIES
+    //
+    
+    vec2 u_Resolution;          // offset: 112, size: 8, base-alignment: 8, aligned-offset: 112
 };
 
 uint hash(uint key) 
@@ -277,11 +286,39 @@ float noise(vec3 coordinates, uint seed, float scale, uint octaves, float lacuna
     return output_noise / divisor;
 }
 
+vec4 map(float value)
+{
+    if (u_MapSize == 0)
+        return vec4(value);
+
+    if (u_MapSize == 1)
+        return u_MapColors[0];
+    
+    vec4 result = vec4(0.0);
+
+    for (uint i = 1; i < u_MapSize - 1; ++i)
+    {
+        float min_v = u_MapRanges[(i - 1) / 4][(i - 1) % 4];
+        float max_v = u_MapRanges[i / 4][i % 4];
+
+        result += u_MapColors[i] * (step(min_v, value) * step(value, max_v));
+    }
+
+    // NOTE: Edge cases (first range min is always 0.0, last range max is always 1.0)
+    //
+    uint last = u_MapSize - 2;
+    result += u_MapColors[0] * step(value, u_MapRanges[0][0]);
+    result += u_MapColors[u_MapSize - 1] * step(u_MapRanges[last / 4][last % 4], value);
+
+    return result;
+}
+
 void main() 
 {
     vec2 uv = gl_FragCoord.xy / u_Resolution * 2.0 - 1.0;
 
     vec3 coordinates = vec3(uv * vec2(u_Resolution.x / u_Resolution.y, 1.0), u_Evolve);
 
-    a_Color = vec4(noise(coordinates, u_Seed, u_Scale, u_Octaves, u_Lacunarity, u_Persistence));
+    float noise_value = noise(coordinates, u_Seed, u_Scale, u_Octaves, u_Lacunarity, u_Persistence);
+    a_Color = map(noise_value);
 }

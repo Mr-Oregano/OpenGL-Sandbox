@@ -41,6 +41,15 @@ void ProceduralTerrainLayer::OnAttach()
 	m_Props.persistence = 1.0f;
 	m_Props.resolution = { Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight() };
 
+	m_Props.mapSize = 2;
+	m_Props.mapColors[0] = { 1.0, 0.0, 0.0, 1.0 };
+	m_Props.mapColors[1] = { 1.0, 0.0, 1.0, 1.0 };
+	
+	for (int i = 0; i < std::size(m_Props.mapRanges); ++i)
+		m_Props.mapRanges[i] = glm::vec4{ 1.0f };
+
+	m_Props.mapRanges[0][0] = 0.5f;
+
 	glNamedBufferStorage(uniformBufferHandle, sizeof(PropertiesUniforms), &m_Props, GL_MAP_WRITE_BIT);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformBufferHandle);
 
@@ -105,6 +114,17 @@ void ProceduralTerrainLayer::OnUpdate(Timestep ts)
 	}
 }
 
+bool ProceduralTerrainLayer::MapEntry(float *colors, float *min, float *max, int id)
+{
+	ImGui::PushID(id);
+	bool changed = ImGui::ColorEdit3("", colors, ImGuiColorEditFlags_NoInputs);
+	ImGui::SameLine();
+	changed = ImGui::DragFloatRange2("", min, max, 0.01f, 0.0f, 1.0f) || changed;
+	ImGui::PopID();
+	
+	return changed;
+}
+
 void ProceduralTerrainLayer::OnImGuiRender()
 {
 	static const char *noise_algorithms[] = { "Simplex Noise", "Perlin Noise" };
@@ -161,6 +181,28 @@ void ProceduralTerrainLayer::OnImGuiRender()
 						   "than the previous.\n\n"
 						   "A Persistence equal to 1.0 means that all octaves will have an equal effect on the "
 						   "output noise.");
+
+	ImGui::Separator();
+
+	ImGui::LabelText("", "Color Map");
+
+	float zeroLock = 0.0f;
+	uniformsIsDirty = MapEntry(glm::value_ptr(m_Props.mapColors[0]), &zeroLock, &m_Props.mapRanges[0][0], 0) || uniformsIsDirty;
+
+	for (unsigned int i = 1; i < m_Props.mapSize - 1; ++i)
+	{
+		float *min_v = &m_Props.mapRanges[(i - 1) / 4][(i - 1) % 4];
+		float *max_v = &m_Props.mapRanges[i / 4][i % 4];
+
+		uniformsIsDirty = MapEntry(glm::value_ptr(m_Props.mapColors[i]), min_v, max_v, i) || uniformsIsDirty;
+	}
+
+	float *min_v = &m_Props.mapRanges[(m_Props.mapSize - 2) / 4][(m_Props.mapSize - 2) % 4];
+	float oneLock = 1.0f;
+	uniformsIsDirty = MapEntry(glm::value_ptr(m_Props.mapColors[m_Props.mapSize - 1]), min_v, &oneLock, m_Props.mapSize - 1) || uniformsIsDirty;
+
+	if (m_Props.mapSize < MAX_MAP_ENTRIES && ImGui::Button("+"))
+		++m_Props.mapSize;
 
 	ImGui::End();
 
