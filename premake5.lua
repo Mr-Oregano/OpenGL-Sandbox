@@ -3,7 +3,7 @@ function CreateDefaultProject(name)
 	project(name)
 	kind "ConsoleApp"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	staticruntime "off"
 
 	targetdir ("bin/%{cfg.architecture}-%{cfg.buildcfg}-%{cfg.system}")
